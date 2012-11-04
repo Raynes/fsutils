@@ -5,7 +5,6 @@ where
 import Control.Monad (liftM)
 import System.Directory (getDirectoryContents, doesDirectoryExist)
 import System.FilePath ((</>))
-import Data.List ((\\))
 
 -- | Checks if a path is '.' or '..'.
 uselessPath :: FilePath -> Bool
