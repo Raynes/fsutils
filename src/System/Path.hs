@@ -1,10 +1,14 @@
 module System.Path ( mtreeList
-                   , fileList )
+                   , fileList
+                   , walkDir
+                   , copyDir
+                   , replaceRoot
+                   , removeRoot )
 where
                      
-import Control.Monad (liftM, filterM)
-import System.Directory (getDirectoryContents, doesDirectoryExist, doesFileExist)
-import System.FilePath ((</>))
+import Control.Monad (liftM, filterM, forM_, mapM_)
+import System.Directory
+import System.FilePath ((</>), addTrailingPathSeparator)
 import Data.List ((\\))
 
 -- | Remove useless paths from a list of paths.
@@ -57,3 +61,22 @@ walkDir root = createDir root >>= mtreeList children
   where children path = do
           let dirs = subDirs path
           mapM createDir dirs
+
+-- | Given a root (prefix), remove it from a path. This is useful
+-- for getting the filename and subdirs of a path inside of a root.
+removeRoot :: FilePath -> FilePath -> FilePath
+removeRoot prefix path = drop (length $ addTrailingPathSeparator prefix) path
+
+-- | Given a root path, a new root path, and a path to be changed,
+-- removes the old root from the path and replaces it with to.
+replaceRoot :: FilePath -> FilePath -> FilePath -> FilePath
+replaceRoot root to path = to </> removeRoot root path
+
+-- | Copy a directory recursively. Moves every file, creates every directory.
+copyDir :: FilePath -> FilePath -> IO ()
+copyDir from to = do
+  createDirectoryIfMissing True to
+  walked <- walkDir from
+  forM_ walked $ \(Directory _ dirs files) -> do
+    mapM_ (createDirectoryIfMissing True . (replaceRoot from to)) dirs
+    mapM_ (\path -> copyFile path (replaceRoot from to path)) files 
