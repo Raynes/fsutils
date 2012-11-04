@@ -1,10 +1,20 @@
-module System.Path ( mtreeList
-                   , fileList
-                   , walkDir
-                   , copyDir
-                   , replaceRoot
-                   , removeRoot )
-where
+-- | A collection of file system utilities that appear to be missing from
+-- Directory, FilePath, Prelude, etc. Some of these may overlap with MissingH
+-- but the versions here will probably be more simplistic. Furthermore, this
+-- library is focused on this one thing and not a whole bunch of things.
+module System.Path
+       ( mtreeList
+       , fileList
+       , walkDir
+       , copyDir
+       , replaceRoot
+       , removeRoot
+       , Directory
+       , dirPath
+       , subDirs
+       , files
+       , createDir
+       ) where
                      
 import Control.Monad (liftM, filterM, forM_, mapM_)
 import System.Directory
@@ -23,6 +33,7 @@ mtreeList children root = do
   joined <- sequence subChildren
   return $ root : concat joined
 
+-- | Get a list of files in path, but not recursively. Removes '.' and '..'.
 topFileList :: FilePath -> IO [FilePath]
 topFileList path = liftM filterUseless (getDirectoryContents path) >>= return . map (path </>)
 
