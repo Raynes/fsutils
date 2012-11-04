@@ -3,7 +3,7 @@
 
 name:                fsutils
 version:             0.1.0
-synopsis:            File system utilities for Haskell that are missing from Hbuilt in libraries.
+synopsis:            File system utilities for Haskell that are missing from built in libraries.
 -- description:         
 homepage:            https://github.com/Raynes/fsutils
 license:             MIT
