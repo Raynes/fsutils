@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                fsutils
-version:             0.1.0
+version:             0.1.1
 synopsis:            File system utilities for Haskell that are missing from built in libraries.
 -- description:         
 homepage:            https://github.com/Raynes/fsutils
