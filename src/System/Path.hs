@@ -29,17 +29,17 @@ filterUseless = (\\ [".", ".."])
 mtreeList :: Monad m => (a -> m [a]) -> a -> m [a]
 mtreeList children root = do
   xs <- children root
-  let subChildren = map (mtreeList children) xs
-  joined <- sequence subChildren
-  return $ root : concat joined
+  subChildren <- mapM (mtreeList children) xs
+  return $ root : concat subChildren
 
 -- | Get a list of files in path, but not recursively. Removes '.' and '..'.
 topFileList :: FilePath -> IO [FilePath]
-topFileList path = liftM filterUseless (getDirectoryContents path) >>= return . map (path </>)
+topFileList path =
+  fmap (map (path </>) . filterUseless) $ getDirectoryContents path
 
 -- | Recursively list the contents of a directory. Depth-first.
 fileList :: FilePath -> IO [FilePath]
-fileList root = mtreeList children root
+fileList = mtreeList children
   where children path = do
           directory <- doesDirectoryExist path
           if directory
@@ -76,7 +76,7 @@ walkDir root = createDir root >>= mtreeList children
 -- | Given a root (prefix), remove it from a path. This is useful
 -- for getting the filename and subdirs of a path inside of a root.
 removeRoot :: FilePath -> FilePath -> FilePath
-removeRoot prefix path = drop (length $ addTrailingPathSeparator prefix) path
+removeRoot prefix = drop . length $ addTrailingPathSeparator prefix
 
 -- | Given a root path, a new root path, and a path to be changed,
 -- removes the old root from the path and replaces it with to.
@@ -89,5 +89,5 @@ copyDir from to = do
   createDirectoryIfMissing True to
   walked <- walkDir from
   forM_ walked $ \(Directory _ dirs files) -> do
-    mapM_ (createDirectoryIfMissing True . (replaceRoot from to)) dirs
-    mapM_ (\path -> copyFile path (replaceRoot from to path)) files 
+    mapM_ (createDirectoryIfMissing True . replaceRoot from to) dirs
+    forM_ files $ \path -> copyFile path (replaceRoot from to path)
