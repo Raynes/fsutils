@@ -14,6 +14,7 @@ module System.Path
        , subDirs
        , files
        , createDir
+       , filterUseless
        ) where
                      
 import Control.Monad (liftM, filterM, forM_, mapM_)
