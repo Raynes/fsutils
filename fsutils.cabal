@@ -20,7 +20,7 @@ library
   hs-source-dirs:   src
   exposed-modules:  System.Path
   -- other-modules:       
-  build-depends:    base >= 4.5 && < 4.12,
+  build-depends:    base >= 4.5 && < 4.13,
                     filepath >= 1.4.1 && < 1.5,
                     directory >= 1.2.6 && < 1.4
 
